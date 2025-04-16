@@ -4,6 +4,7 @@ import { ChevronDown, Search, Camera, Brush, Users, Palette, Coffee, Diamond, Sh
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthModal from '../../components/auth/AuthModal';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 const menuItems = [
   {
@@ -71,7 +72,8 @@ const menuItems = [
 const Header = () => {
   const [isVendorsOpen, setIsVendorsOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
+  const { getItem } = useLocalStorage();
+  const user = getItem('token');
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -134,18 +136,44 @@ const Header = () => {
 
           {/* Auth buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="text-gray-700 hover:text-gray-900"
-            >
-              Login
-            </button>
-            <Link
-              to="/vendor/register"
-              className="text-purple-600 hover:text-purple-700"
-            >
-              Are you a vendor?
-            </Link>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <Link to="/dashboard" className="text-gray-700 hover:text-gray-900">
+                  Dashboard
+                </Link>
+                <div className="flex items-center space-x-2">
+                  {user.profilePicture ? (
+                    <img 
+                      src={user.profilePicture} 
+                      alt={user.name} 
+                      className="w-8 h-8 rounded-full object-cover" 
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                      <span className="text-purple-700 font-medium text-sm">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-gray-700">{user.name}</span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  Login
+                </button>
+                <Link
+                  to="/vendor/register"
+                  className="text-purple-600 hover:text-purple-700"
+                >
+                  Are you a vendor?
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
